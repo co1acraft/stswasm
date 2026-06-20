@@ -1,0 +1,13 @@
+<!-- STS bundle references + embedded manifest (hand-written; asm + lwjgl3 only). -->
+<Project>
+  <ItemGroup>
+    <Reference Include="..\jars\ikvmc_asm-9.9.dll" />
+    <Reference Include="..\statics\ikvmc_lwjgl3-3.2.2.dll" />
+
+    <AOTWhitelist Include="ikvmc_lwjgl3-3.2.2" />
+
+    <EmbeddedResource Include="ikvmc-manifest.g.json">
+      <LogicalName>IkvmWasm.ikvmc-manifest.json</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

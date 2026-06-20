@@ -1,0 +1,20 @@
+{
+  "bundles": [
+    {
+      "name": "asm",
+      "assemblyName": "ikvmc_asm-9.9",
+      "prefixes": ["org.objectweb.asm."],
+      "alwaysReplace": true,
+      "jars": [],
+      "hideJars": []
+    },
+    {
+      "name": "lwjgl3",
+      "assemblyName": "ikvmc_lwjgl3-3.2.2",
+      "prefixes": ["org.lwjgl."],
+      "alwaysReplace": true,
+      "jars": [],
+      "hideJars": []
+    }
+  ]
+}

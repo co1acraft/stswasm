@@ -1,0 +1,20 @@
+# Normalize line endings: text files are LF in the repo.
+* text=auto eol=lf
+
+# Keep shell scripts LF even on Windows checkouts.
+*.sh text eol=lf
+
+# Binary assets that must never be line-ending munged or diffed as text.
+*.jar  binary
+*.dll  binary
+*.pdb  binary
+*.a    binary
+*.o    binary
+*.so   binary
+*.wasm binary
+*.dat  binary
+*.aotprofile binary
+*.png  binary
+*.ogg  binary
+*.ttf  binary
+*.otf  binary
