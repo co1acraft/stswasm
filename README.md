@@ -1,6 +1,7 @@
 # stswasm — Slay the Spire in the browser (WebAssembly)
 > [!WARNING]
 > This project is literally entirely written with opus 4.8 cannon, it is probably terrible and mainly exists as POC more than anything. PLEASE feel free to open prs to make it better or even fork it and juust make it your own.
+
 `stswasm` runs the desktop Java build of **Slay the Spire** entirely client-side in
 a web browser by compiling it to WebAssembly. The game's Java bytecode is run on
 the .NET runtime via **IKVM** (Java → .NET), and the whole thing — IKVM, the .NET
