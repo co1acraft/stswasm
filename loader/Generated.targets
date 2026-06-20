@@ -2,7 +2,7 @@
 <Project>
   <ItemGroup>
     <Reference Include="..\jars\ikvmc_asm-9.9.dll" />
-    <Reference Include="..\statics\ikvmc_lwjgl3-3.2.2.dll" />
+    <Reference Include="..\vendor\ikvmc_lwjgl3-3.2.2.dll" />
 
     <AOTWhitelist Include="ikvmc_lwjgl3-3.2.2" />
 

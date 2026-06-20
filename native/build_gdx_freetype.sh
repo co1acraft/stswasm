@@ -1,10 +1,10 @@
 #!/bin/bash
 # Compile libGDX 1.9.5's gdx-freetype JNI wrapper to a WASM static archive. The wrapper only
 # calls the standard FreeType C API (FT_*), which is already provided by the JDK's libfreetype.a
-# (statics/ikvm/libfreetype.a, linked by IkvmWasm.csproj) -- so we compile against the emscripten
+# (vendor/ikvm/libfreetype.a, linked by IkvmWasm.csproj) -- so we compile against the emscripten
 # freetype-port HEADERS but do NOT bundle a second FreeType library.
 set -e
-EMSDK=${EMSDK:-/home/ubuntu/Documents/ikvmcraft/statics/emsdk}
+EMSDK=${EMSDK:-$(cd "$(dirname "$0")/.." && pwd)/vendor/emsdk}
 export EM_CONFIG=$EMSDK/emscripten/.emscripten
 export PATH=$EMSDK/emscripten:$EMSDK/bin:$PATH
 

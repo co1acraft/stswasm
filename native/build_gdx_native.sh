@@ -3,7 +3,7 @@
 # image decode, ETC1) to a WASM static archive. jpgd is replaced with a stub so the
 # archive has no setjmp/longjmp dependency (stb_image decodes JPEG).
 set -e
-EMSDK=${EMSDK:-/home/ubuntu/Documents/ikvmcraft/statics/emsdk}
+EMSDK=${EMSDK:-$(cd "$(dirname "$0")/.." && pwd)/vendor/emsdk}
 export EM_CONFIG=$EMSDK/emscripten/.emscripten
 export EM_FROZEN_CACHE=
 export PATH=$EMSDK/emscripten:$EMSDK/bin:$PATH

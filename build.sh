@@ -18,15 +18,22 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
 # --- configurable toolchain locations -----------------------------------------------------------
-JAVA_HOME="${JAVA_HOME:-/tmp/stsbuild/jdk-17.0.10+7}"
-EMSDK="${EMSDK:-$ROOT/statics/emsdk}"
-STS_DIR="${STS_DIR:-/home/ubuntu/Documents/slaythespire/Slay.the.Spire.v2.3.4}"
-STS_JAR="${STS_JAR:-$STS_DIR/desktop-1.0.jar}"
+# All paths default to in-repo locations; override any of them via the environment:
+#   JAVA_HOME         JDK 17 (optional; falls back to javac/jar on PATH)
+#   EMSDK             Emscripten SDK          (external toolchain; default vendor/emsdk)
+#   DOTNET_WASM_PACK  .NET wasm runtime pack  (external toolchain; default vendor/dotnet)
+#   STS_JAR           your Slay the Spire desktop-1.0.jar (default game/desktop-1.0.jar)
+EMSDK="${EMSDK:-$ROOT/vendor/emsdk}"
+DOTNET_WASM_PACK="${DOTNET_WASM_PACK:-$ROOT/vendor/dotnet}"
+STS_JAR="${STS_JAR:-$ROOT/game/desktop-1.0.jar}"
 AOT="${AOT:-false}"
 OPT="${OPT:-false}"
+# Consumed by IkvmWasm.csproj (dotnet publish) and the native/ build scripts.
+export EMSDK DOTNET_WASM_PACK
 
-JAVAC="$JAVA_HOME/bin/javac"
-JAR="$JAVA_HOME/bin/jar"
+# JDK tools: prefer $JAVA_HOME/bin if set, otherwise whatever is on PATH.
+JAVAC="${JAVA_HOME:+$JAVA_HOME/bin/}javac"
+JAR="${JAVA_HOME:+$JAVA_HOME/bin/}jar"
 PUBLISH_DIR="$ROOT/loader/bin/Release/net10.0/publish/wwwroot/_framework"
 PUBLIC="$ROOT/frontend/public"
 # libGDX jars the launcher compiles against (core + lwjgl3 backend).
@@ -47,7 +54,7 @@ target_native() {
 }
 
 target_launcher() {
-  [ -x "$JAVAC" ] || die "javac not found at $JAVAC (set JAVA_HOME)"
+  command -v "$JAVAC" >/dev/null 2>&1 || die "javac not found ($JAVAC); set JAVA_HOME or put javac on PATH"
   say launcher "javac launcher/src -> launcher/out"
   rm -rf "$ROOT/launcher/out"
   mkdir -p "$ROOT/launcher/out"
@@ -91,7 +98,7 @@ target_deploy() {
   if [ ! -d "$PUBLIC/image" ] || [ "${FORCE_IMAGE:-0}" = "1" ]; then
     say deploy "copying IKVM Java image -> frontend/public/image"
     rm -rf "$PUBLIC/image"
-    cp -r "$ROOT/statics/ikvm/image" "$PUBLIC/image"
+    cp -r "$ROOT/vendor/ikvm/image" "$PUBLIC/image"
   else
     say deploy "frontend/public/image present (FORCE_IMAGE=1 to refresh)"
   fi

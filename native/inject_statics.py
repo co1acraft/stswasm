@@ -2,12 +2,14 @@
 """Produce stswasm/loader/statics.c = ikvmcraft's full registry + the libGDX core JNI block
 (libgdx.a) + the gdx-freetype JNI block (libgdxfreetype.a), with registry entries for both native
 markers and the library count bumped accordingly."""
-import subprocess, sys, re
+import os, subprocess, sys, re
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-BASE = Path("/home/ubuntu/Documents/ikvmcraft/loader/statics.c")
-OUT = Path("/home/ubuntu/Documents/slaythespire/stswasm/loader/statics.c")
+ROOT = HERE.parent  # stswasm/
+# ikvmcraft's base statics.c registry is vendored in-repo; override with IKVMCRAFT_STATICS_C.
+BASE = Path(os.environ.get("IKVMCRAFT_STATICS_C", ROOT / "vendor" / "ikvmcraft-statics.c"))
+OUT = Path(os.environ.get("STSWASM_STATICS_C", ROOT / "loader" / "statics.c"))
 
 # (generator script, marker path, symbol-table identifier)
 BLOCKS = [

@@ -38,17 +38,23 @@
 		<WebAssemblyEnableStreamingResponse>true</WebAssemblyEnableStreamingResponse>
 
 		<!-- MAXIMUM_MEMORY is 65535 wasm pages -->
-		<EmccExtraLDFlags>-sWASMFS -sMAXIMUM_MEMORY=4294901760 -sMALLOC=mimalloc -sOFFSCREENCANVAS_SUPPORT -I$(MSBuildProjectDirectory)/../statics/mojoAL/AL -I$(MSBuildProjectDirectory)/../statics/SDL/include</EmccExtraLDFlags>
+		<EmccExtraLDFlags>-sWASMFS -sMAXIMUM_MEMORY=4294901760 -sMALLOC=mimalloc -sOFFSCREENCANVAS_SUPPORT</EmccExtraLDFlags>
 		<EmccExtraLDFlags>$(EmccExtraLDFlags) -sMIN_FIREFOX_VERSION=2147483647 -sMIN_SAFARI_VERSION=2147483647 -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sFULL_ES3 -sFULL_ES2</EmccExtraLDFlags>
-		<EmccExtraLDFlags>$(EmccExtraLDFlags) --js-library $(MSBuildProjectDirectory)/../statics/lib_emscripten_glfw3.js</EmccExtraLDFlags>
+		<EmccExtraLDFlags>$(EmccExtraLDFlags) --js-library $(MSBuildProjectDirectory)/../vendor/lib_emscripten_glfw3.js</EmccExtraLDFlags>
 		<EmccLinkOptimizationFlag>-O3</EmccLinkOptimizationFlag>
 		<EmccCompileOptimizationFlag>-O3</EmccCompileOptimizationFlag>
 		<EmccEnvironment>web,worker</EmccEnvironment>
 
-		<MicrosoftNetCoreAppRuntimePackDir>$(MSBuildProjectDirectory)\..\statics\dotnet</MicrosoftNetCoreAppRuntimePackDir>
+		<!-- .NET wasm runtime pack: external toolchain. Override with the DOTNET_WASM_PACK
+		     env var (or -p:MicrosoftNetCoreAppRuntimePackDir=...). Defaults to vendor/dotnet. -->
+		<MicrosoftNetCoreAppRuntimePackDir Condition="'$(MicrosoftNetCoreAppRuntimePackDir)' == '' and '$(DOTNET_WASM_PACK)' != ''">$(DOTNET_WASM_PACK)</MicrosoftNetCoreAppRuntimePackDir>
+		<MicrosoftNetCoreAppRuntimePackDir Condition="'$(MicrosoftNetCoreAppRuntimePackDir)' == ''">$(MSBuildProjectDirectory)\..\vendor\dotnet</MicrosoftNetCoreAppRuntimePackDir>
 		<MicrosoftNetCoreAppRuntimePackRidDir>$(MicrosoftNetCoreAppRuntimePackDir)\runtimes\browser-wasm</MicrosoftNetCoreAppRuntimePackRidDir>
 		<MonoAotCrossDir>$(MicrosoftNetCoreAppRuntimePackDir)\cross</MonoAotCrossDir>
-		<EmsdkRoot>$(MSBuildProjectDirectory)\..\statics\emsdk\</EmsdkRoot>
+		<!-- Emscripten SDK: external toolchain (too large for git). Override with the EMSDK
+		     env var (or -p:EmsdkRoot=...). Defaults to vendor/emsdk. -->
+		<EmsdkRoot Condition="'$(EmsdkRoot)' == '' and '$(EMSDK)' != ''">$([MSBuild]::EnsureTrailingSlash('$(EMSDK)'))</EmsdkRoot>
+		<EmsdkRoot Condition="'$(EmsdkRoot)' == ''">$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '..', 'vendor', 'emsdk'))</EmsdkRoot>
 		<WasmCachePath>$(EmsdkRoot)\emscripten\cache\</WasmCachePath>
 		<!-- Keep this DIFFERENT from WasmCachePath so the WASM SDK does NOT set
 		     EM_FROZEN_CACHE=1 (BrowserWasmApp.targets) — our cache is built on demand. -->
@@ -179,29 +185,29 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<NativeFileReference Include="..\statics\ikvm\libiava.a" />
-		<NativeFileReference Include="..\statics\ikvm\libikvm.a" />
-		<NativeFileReference Include="..\statics\ikvm\libjvm.a" />
-		<NativeFileReference Include="..\statics\ikvm\libzip.a" />
-		<NativeFileReference Include="..\statics\ikvm\libnio.a" />
-		<NativeFileReference Include="..\statics\ikvm\libnet.a" />
-		<NativeFileReference Include="..\statics\ikvm\libmanagement.a" />
-		<NativeFileReference Include="..\statics\ikvm\libjpeg.a" />
-		<NativeFileReference Include="..\statics\ikvm\libmlib_image.a" />
-		<NativeFileReference Include="..\statics\ikvm\liblcms.a" />
-		<NativeFileReference Include="..\statics\ikvm\libawt.a" />
-		<NativeFileReference Include="..\statics\ikvm\libfontmanager.a" />
-		<NativeFileReference Include="..\statics\ikvm\libfreetype.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libiava.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libikvm.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libjvm.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libzip.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libnio.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libnet.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libmanagement.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libjpeg.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libmlib_image.a" />
+		<NativeFileReference Include="..\vendor\ikvm\liblcms.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libawt.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libfontmanager.a" />
+		<NativeFileReference Include="..\vendor\ikvm\libfreetype.a" />
 		<NativeFileReference Include="Emscripten.c" />
 		<NativeFileReference Include="statics.c" />
 		<NativeFileReference Include="icalls.c" />
 
-		<NativeFileReference Include="..\statics\SDL3.a" />
-		<NativeFileReference Include="..\statics\libglfw3.a" />
-		<NativeFileReference Include="..\statics\liblwjgl3.a" />
-		<NativeFileReference Include="..\statics\libffi.a" />
-		<NativeFileReference Include="..\statics\liblwjgl_stb.a" />
-		<NativeFileReference Include="..\statics\libopenal.a" />
+		<NativeFileReference Include="..\vendor\SDL3.a" />
+		<NativeFileReference Include="..\vendor\libglfw3.a" />
+		<NativeFileReference Include="..\vendor\liblwjgl3.a" />
+		<NativeFileReference Include="..\vendor\libffi.a" />
+		<NativeFileReference Include="..\vendor\liblwjgl_stb.a" />
+		<NativeFileReference Include="..\vendor\libopenal.a" />
 
 		<!-- libGDX core JNI (gdx-platform) compiled to WASM (see native/build_gdx_native.sh) -->
 		<NativeFileReference Include="..\native\libgdx.a" />
@@ -213,10 +219,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Reference Include="..\statics\ikvm\IKVM.ByteCode.dll" />
-		<Reference Include="..\statics\ikvm\IKVM.CoreLib.dll" />
-		<Reference Include="..\statics\ikvm\IKVM.Java.dll" />
-		<Reference Include="..\statics\ikvm\IKVM.Runtime.dll" />
+		<Reference Include="..\vendor\ikvm\IKVM.ByteCode.dll" />
+		<Reference Include="..\vendor\ikvm\IKVM.CoreLib.dll" />
+		<Reference Include="..\vendor\ikvm\IKVM.Java.dll" />
+		<Reference Include="..\vendor\ikvm\IKVM.Runtime.dll" />
 		<PackageReference Include="System.Runtime.Serialization.Formatters" Version="10.0.3" />
 	</ItemGroup>
 

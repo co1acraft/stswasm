@@ -2,14 +2,17 @@
 // app, and streams page console/exception output to stdout. Usage: node smoketest.mjs [app] [secs]
 import { spawn } from "node:child_process";
 import { rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 const cleanup = () => { try { rmSync(PROF, { recursive: true, force: true }); } catch {} };
 
 const APP = process.argv[2] || "gdxtest";
 const SECS = +(process.argv[3] || 90);
-const URL = `http://localhost:8088/?app=${APP}`;
-const PROF = `/tmp/chrome-prof-${APP}-${process.pid}-${Date.now()}`;
+const PORT = process.env.PORT || 8088;
+const URL = `http://localhost:${PORT}/?app=${APP}`;
+const PROF = join(tmpdir(), `chrome-prof-${APP}-${process.pid}-${Date.now()}`);
 
-const chrome = spawn("chromium", [
+const chrome = spawn(process.env.CHROME || "chromium", [
   "--headless=new", "--no-sandbox", "--disable-dev-shm-usage",
   "--use-gl=angle", "--use-angle=swiftshader-webgl", "--enable-unsafe-swiftshader",
   "--enable-experimental-webassembly-jspi",
@@ -86,7 +89,7 @@ async function main() {
     // Race against a timeout: captureScreenshot blocks indefinitely if the render thread is pegged.
     const shot = await Promise.race([sendAwait("Page.captureScreenshot", { format: "png" }),
                                      new Promise((r) => setTimeout(() => r(null), 10000))]);
-    if (shot?.data) { const f = `/tmp/shot-${APP}.png`; writeFileSync(f, Buffer.from(shot.data, "base64")); console.log(`[smoketest] screenshot -> ${f}`); }
+    if (shot?.data) { const f = join(tmpdir(), `shot-${APP}.png`); writeFileSync(f, Buffer.from(shot.data, "base64")); console.log(`[smoketest] screenshot -> ${f}`); }
     else console.log("[smoketest] screenshot timed out (render thread busy)");
   } catch (e) { console.log("[smoketest] screenshot failed: " + e); }
   console.log("[smoketest] done");

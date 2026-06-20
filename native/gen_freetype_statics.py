@@ -5,13 +5,14 @@ Signatures come from the jnigen header (machine-generated, javah-style). JNI ABI
 is identical to the gdx-core generator. Registered under /tmp/lwjgl/libgdx-freetype64.so, which the
 Java launcher System.load's (and SharedLibraryLoader.setLoaded("gdx-freetype") so libGDX does not
 try to extract+dlopen the real .so)."""
-import re, subprocess, sys
+import os, re, subprocess, sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 HEADER = HERE / "gdxfreetype" / "com.badlogic.gdx.graphics.g2d.freetype.FreeType.h"
 ARCHIVE = HERE / "libgdxfreetype.a"
-LLVM_NM = "/home/ubuntu/Documents/ikvmcraft/statics/emsdk/bin/llvm-nm"
+EMSDK = os.environ.get("EMSDK", str(HERE.parent / "vendor" / "emsdk"))
+LLVM_NM = os.environ.get("LLVM_NM", str(Path(EMSDK) / "bin" / "llvm-nm"))
 
 TYPE = {
     "void": "void", "jint": "int", "jlong": "long long", "jfloat": "float",

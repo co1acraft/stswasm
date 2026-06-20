@@ -10,18 +10,22 @@ Signatures come from the libGDX JNI headers (Apache-2.0). JNI ABI -> wasm C type
   jfloat                                   -> float ; jdouble -> double ; void -> void
 The declared signature matters: wasm call_indirect dispatches on it.
 """
-import re, subprocess, sys
+import os, re, subprocess, sys
 from pathlib import Path
 
-JNI_DIR = Path("/tmp/stsbuild/libgdx-1.9.5/gdx/jni")
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent  # stswasm/
+# libGDX 1.9.5 source tree's gdx/jni dir (external; only needed to regenerate statics.c).
+JNI_DIR = Path(os.environ.get("GDX_JNI_DIR", ""))
 HEADERS = [
     "com.badlogic.gdx.utils.BufferUtils.h",
     "com.badlogic.gdx.math.Matrix4.h",
     "com.badlogic.gdx.graphics.g2d.Gdx2DPixmap.h",
     "com.badlogic.gdx.graphics.glutils.ETC1.h",
 ]
-ARCHIVE = Path("/home/ubuntu/Documents/slaythespire/stswasm/native/libgdx.a")
-LLVM_NM = "/home/ubuntu/Documents/ikvmcraft/statics/emsdk/bin/llvm-nm"
+ARCHIVE = HERE / "libgdx.a"
+EMSDK = os.environ.get("EMSDK", str(ROOT / "vendor" / "emsdk"))
+LLVM_NM = os.environ.get("LLVM_NM", str(Path(EMSDK) / "bin" / "llvm-nm"))
 REG_PATH = "/tmp/lwjgl/libgdx64.so"
 
 TYPE = {
@@ -42,6 +46,8 @@ decl_re = re.compile(
 )
 
 def parse_headers():
+    if not JNI_DIR.is_dir():
+        sys.exit(f"set GDX_JNI_DIR to libGDX 1.9.5's gdx/jni dir (got: {str(JNI_DIR) or '<unset>'})")
     sigs = {}
     for h in HEADERS:
         text = (JNI_DIR / h).read_text()
