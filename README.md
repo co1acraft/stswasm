@@ -172,4 +172,3 @@ external input is one of the variables above.
 - The original code in this repository (`loader/`, `launcher/`, `native/`,
   `frontend/`, `build.sh`) has no license file yet — **add a `LICENSE`** before
   publishing if you intend others to reuse it.
-```
